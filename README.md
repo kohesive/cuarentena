@@ -21,13 +21,7 @@ Cuarentena use cases:
 
 ### Gradle /Maven
 
-Using `Kotlin 1.50+`, add this repo:
-
-```
-http://dl.bintray.com/jaysonminard/kohesive
-```
-
-add add the following artifact:
+Add add the following dependency:
 
 ```
 uy.kohesive.cuarentena:cuarentena:1.0.0-BETA-01

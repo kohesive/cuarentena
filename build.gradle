@@ -39,6 +39,9 @@ subprojects {
     repositories {
         jcenter()
         mavenCentral()
+        maven {
+            url 'https://dl.bintray.com/jaysonminard/kohesive'
+        }
     }
 
     dependencies {
@@ -102,6 +105,11 @@ subprojects {
                     id 'apatrida'
                     name 'Jayson Minard'
                     email 'jayson.minard@gmail.com'
+                }
+                developer {
+                    id 'brainoutsource'
+                    name 'Alex Eliseyev'
+                    email 'a.a.eliseyev@gmail.com'
                 }
             }
         }

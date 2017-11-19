@@ -27,24 +27,24 @@ class Cuarentena(val policies: Set<String> = painlessPlusKotlinBootstrapPolicy) 
     }
 
     fun verifyClassAgainstPoliciesPerClass(newClasses: List<NamedClassBytes>, additionalPolicies: Set<String> = emptySet()): List<VerifyResultsPerClass> {
-        val newClassNames   = newClasses.map { it.className }
+        val newClassNames = newClasses.map { it.className }
         val filteredClasses = filterKnownClasses(newClasses, additionalPolicies)
 
         return filteredClasses.map { filteredClass ->
             val filteredClassDesiredAllowances = scanClassByteCodeForDesiredAllowances(listOf(filteredClass))
 
             val violations = filteredClassDesiredAllowances.allowances
-                .filterNot {
-                    // new classes can call themselves, so these can't be violations
-                    it.fqnTarget in newClassNames
-                }.filterNot { it.assertAllowance(additionalPolicies) }
+                    .filterNot {
+                        // new classes can call themselves, so these can't be violations
+                        it.fqnTarget in newClassNames
+                    }.filterNot { it.assertAllowance(additionalPolicies) }
 
             val violationStrings = violations.map { it.resultingViolations(additionalPolicies) }.flatten().toSet()
 
             VerifyResultsPerClass(
-                violatingClass = filteredClass,
-                scanResults    = filteredClassDesiredAllowances,
-                violations     = violationStrings
+                    violatingClass = filteredClass,
+                    scanResults = filteredClassDesiredAllowances,
+                    violations = violationStrings
             )
         }.filter {
             it.violations.isNotEmpty()
@@ -52,7 +52,7 @@ class Cuarentena(val policies: Set<String> = painlessPlusKotlinBootstrapPolicy) 
     }
 
     fun verifyClassAgainstPolicies(newClasses: List<NamedClassBytes>, additionalPolicies: Set<String> = emptySet()): VerifyResults {
-        val filteredClasses  = filterKnownClasses(newClasses, additionalPolicies)
+        val filteredClasses = filterKnownClasses(newClasses, additionalPolicies)
         val classScanResults = scanClassByteCodeForDesiredAllowances(filteredClasses)
 
         val filteredClassNames = filteredClasses.map { it.className }.toSet()
@@ -76,9 +76,9 @@ class Cuarentena(val policies: Set<String> = painlessPlusKotlinBootstrapPolicy) 
     }
 
     data class VerifyResultsPerClass(
-        val violatingClass: NamedClassBytes,
-        val scanResults: ClassAllowanceDetector.ScanState,
-        val violations: Set<String>
+            val violatingClass: NamedClassBytes,
+            val scanResults: ClassAllowanceDetector.ScanState,
+            val violations: Set<String>
     )
 
     data class VerifyResults(val scanResults: ClassAllowanceDetector.ScanState, val violations: Set<String>, val filteredClasses: List<NamedClassBytes>) {

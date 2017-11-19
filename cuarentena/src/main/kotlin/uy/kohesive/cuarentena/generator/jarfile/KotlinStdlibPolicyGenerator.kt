@@ -9,14 +9,14 @@ class KotlinStdlibPolicyGenerator : JarAllowancesGenerator(
         postFilterPackageWhiteList = WhiteListedPrefixes,
         postFilterClassBlackList = BlackListedClasses,
         postFilterPackageBlackList = BlackListedPackages,
-    scanMode           = ScanMode.SAFE,
-    useBootStrapPolicy = true
+        scanMode = ScanMode.SAFE,
+        useBootStrapPolicy = true
 ) {
 
     companion object {
         val BlackListedPackages = listOf(
-            "kotlin.io",
-            "kotlin.concurrent",
+                "kotlin.io",
+                "kotlin.concurrent",
                 "kotlin.coroutines"
         )
 

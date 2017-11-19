@@ -1,0 +1,8 @@
+include 'cuarentena',
+        'cuarentena-policy',
+        'cuarentena-painless-parser',
+        'cuarentena-painless-policy',
+        'cuarentena-painless-plus'
+
+
+

@@ -1,0 +1,21 @@
+ext {
+    projectUrl ="https://github.com/kohesive/cuarentena"
+    projectName = "Cuarentena"
+    projectDescription = 'Painless class validation for secure execution of code and scripts down to the method/property level.'
+    projectInception = '2017'
+
+    sonatypePackageGroup = "uy.kohesive"
+    scmUrl = "git://github.com:kohesive/cuarentena.git"
+    scmGitFile = "scm:git@github.com:kohesive/cuarentena.git"
+
+    pomProjectName = projectName
+    groupName = project.group
+
+    licenseName = "MIT"
+    licenseUrl = "$projectUrl/blob/master/LICENSE"
+
+    organisation = groupName
+    primaryEmail = "oss@kohesive.io"
+
+    binTrayRepo = "kohesive"
+}

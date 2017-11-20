@@ -4,8 +4,7 @@ import uy.kohesive.cuarentena.policy.AccessTypes
 import uy.kohesive.cuarentena.policy.PolicyAllowance
 import uy.kohesive.cuarentena.policy.toPolicy
 
-// TODO: move to a policy file/generator outside of here for Kotlin safe calls
-object KotlinPolicies {
+internal object KotlinBootstrapPolicies {
 
     val primitiveArrayAccessPolicy = listOf('B', 'C', 'D', 'F', 'I', 'J', 'S', 'V', 'Z').map {
         PolicyAllowance.ClassLevel.ClassAccess("[$it", setOf(AccessTypes.ref_Class_Instance))

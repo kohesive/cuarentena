@@ -1,7 +1,7 @@
 package uy.kohesive.cuarentena
 
 import uy.kohesive.cuarentena.ClassAllowanceDetector.scanClassByteCodeForDesiredAllowances
-import uy.kohesive.cuarentena.KotlinPolicies.painlessKotlinBootstrapPolicy
+import uy.kohesive.cuarentena.KotlinBootstrapPolicies.painlessKotlinBootstrapPolicy
 import uy.kohesive.cuarentena.generator.jarfile.KotlinStdlibPolicyGenerator
 import uy.kohesive.cuarentena.policy.ALL_CLASS_ACCESS_TYPES
 import uy.kohesive.cuarentena.policy.AccessTypes
@@ -17,13 +17,17 @@ import uy.kohesive.cuarentena.policy.PolicyAllowance
 class Cuarentena(val policies: Set<String> = painlessPlusKotlinBootstrapPolicy) {
 
     companion object {
-        private val painlessBaseJavaPolicy: Set<String> by lazy { CuarentenaPolicyLoader.loadPolicy("painless-base-java") }
+        @JvmStatic
+        val painlessPlusBaseJavaPolicy: Set<String> by lazy { CuarentenaPolicyLoader.loadPolicy("painless-base-java") }
 
-        internal val painlessPlusKotlinBootstrapPolicy = painlessBaseJavaPolicy + painlessKotlinBootstrapPolicy
-        internal fun createKotlinBootstrapCuarentena() = Cuarentena(painlessPlusKotlinBootstrapPolicy)
+        @JvmStatic
+        val painlessPlusKotlinBootstrapPolicy: Set<String> by lazy { painlessPlusBaseJavaPolicy + painlessKotlinBootstrapPolicy }
 
-        val painlessPlusKotlinPolicy: Set<String> by lazy { painlessPlusKotlinBootstrapPolicy + KotlinStdlibPolicyGenerator().generatePolicy() }
-        fun createKotlinCuarentena() = Cuarentena(painlessPlusKotlinPolicy)
+        @JvmStatic
+        val painlessPlusKotlinFullPolicy: Set<String> by lazy { painlessPlusKotlinBootstrapPolicy + KotlinStdlibPolicyGenerator().generatePolicy() }
+
+        @JvmStatic
+        val defaultCuarentena: Cuarentena by lazy {  Cuarentena(painlessPlusKotlinFullPolicy) }
     }
 
     fun verifyClassAgainstPoliciesPerClass(newClasses: List<NamedClassBytes>, additionalPolicies: Set<String> = emptySet()): List<VerifyResultsPerClass> {

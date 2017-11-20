@@ -6,22 +6,21 @@ import java.util.*
 import kotlin.reflect.KClass
 
 internal object ClassPathUtils {
-    fun findKotlinStdLibOrEmbeddedCompilerJars(): List<File> {
-        val stdlibCheck = listOf(Pair::class.containingClasspath(""".*\/kotlin-stdlib.*\.jar""".toRegex())).filterNotNull()
-        val embdCompilerCheck = listOf(Pair::class.containingClasspath(""".*\/kotlin-compiler-embeddable.*\.jar""".toRegex())).filterNotNull()
+    fun findKotlinStdLibOrEmbeddedCompilerJars(classLoader: ClassLoader): List<File> {
+        val stdlibCheck = listOf(Pair::class.containingClasspath(classLoader, """.*\/kotlin-stdlib.*\.jar""".toRegex())).filterNotNull()
+        val embdCompilerCheck = listOf(Pair::class.containingClasspath(classLoader, """.*\/kotlin-compiler-embeddable.*\.jar""".toRegex())).filterNotNull()
         return (stdlibCheck.takeUnless { it.isEmpty() } ?: embdCompilerCheck).assertNotEmpty("Cannot find kotlin stdlib classpath, which is required")
     }
 
-
-    fun <T: Any> getResources(relatedClass: KClass<T>, name: String): Enumeration<URL>? {
-        return relatedClass.java.classLoader.getResources(name) ?:
-                Thread.currentThread().contextClassLoader.getResources(name) ?:
-                ClassLoader.getSystemClassLoader().getResources(name)
+    fun <T: Any> getResources(classLoader: ClassLoader, relatedClass: KClass<T>, name: String): Enumeration<URL>? {
+        return classLoader.getResources(name)
+                ?: relatedClass.java.classLoader.getResources(name)
+                ?: Thread.currentThread().contextClassLoader.getResources(name)
     }
 
-    private fun <T : Any> KClass<T>.containingClasspath(filterJarName: Regex = ".*".toRegex()): File? {
+    private fun <T : Any> KClass<T>.containingClasspath(classLoader: ClassLoader, filterJarName: Regex = ".*".toRegex()): File? {
         val clp = "${qualifiedName?.replace('.', '/')}.class"
-        val baseList = getResources(this, clp) ?.toList() ?.map { it.toString() }
+        val baseList = getResources(classLoader, this, clp) ?.toList() ?.map { it.toString() }
         return baseList
                 ?.map { url ->
                     zipOrJarUrlToBaseFile(url) ?: qualifiedName?.let { classFilenameToBaseDir(url, clp) }

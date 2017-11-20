@@ -10,7 +10,16 @@ buildscript {
         classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: version_kotlin
         classpath 'com.bmuschko:gradle-nexus-plugin:2.3.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0"
     }
+}
+
+apply plugin: 'io.codearte.nexus-staging'
+
+nexusStaging {
+    packageGroup = 'uy.kohesive'
+    username = project.hasProperty('nexusUsername') ? nexusUsername : System.getenv('nexusUsername')
+    password = project.hasProperty('nexusPassword') ? nexusPassword : System.getenv('nexusPassword')
 }
 
 subprojects {
@@ -157,3 +166,4 @@ task release() {
 
 
 defaultTasks 'clean', 'jars'
+

@@ -2,7 +2,6 @@ package uy.kohesive.cuarentena.generator.jarfile
 
 import uy.kohesive.cuarentena.Cuarentena
 import uy.kohesive.cuarentena.NamedClassBytes
-import uy.kohesive.cuarentena.generator.jarfile.KotlinStdlibPolicyGenerator.Companion.KotlinJarFiles
 import uy.kohesive.cuarentena.policy.toPolicy
 import java.io.File
 import java.io.FileInputStream
@@ -35,10 +34,11 @@ open class JarAllowancesGenerator(
         val postFilterPackageWhiteList: List<String>,
         val postFilterPackageBlackList: List<String>,
         val postFilterClassBlackList: Set<String>,
-        val useBootStrapPolicy: Boolean = false,
         val verbose: Boolean = false,
-        val debugCallback: DebugCallback = DefaultDebugCallback
-) {
+        val debugCallback: DebugCallback = DefaultDebugCallback,
+        val verifier: Cuarentena,
+        val useClassLoader: ClassLoader = JarAllowancesGenerator::class.java.classLoader) {
+
     init {
         if (jarFiles.isEmpty()) {
             throw IllegalArgumentException("No jar files passed")
@@ -56,25 +56,16 @@ open class JarAllowancesGenerator(
         }
     }
 
-    internal fun verifyClasses(): ClassesVerifyResult {
-        return verifyClasses(listClassnamesFromJar())
+    internal fun verifyClasses(classLoader: ClassLoader = useClassLoader): ClassesVerifyResult {
+        return verifyClasses(listClassnamesFromJars(), classLoader)
     }
 
-    fun verifyClasses(classNames: Set<String>): ClassesVerifyResult {
-        val cuarentena = if (useBootStrapPolicy) {
-            debug("Building kotlin whitelist for ${KotlinJarFiles.joinToString(", ")}")
-            Cuarentena.createKotlinBootstrapCuarentena().apply {
-                debug("Done processing kotlin")
-            }
-        } else {
-            Cuarentena.createKotlinCuarentena()
-        }
-
+    private fun verifyClasses(classNames: Set<String>, classLoader: ClassLoader = useClassLoader): ClassesVerifyResult {
         val allClasses = classNames.map { className ->
-            classBytesForClass(className, Thread.currentThread().contextClassLoader)
+            classBytesForClass(className, classLoader)
         }
 
-        val perClassViolations = cuarentena.verifyClassAgainstPoliciesPerClass(allClasses)
+        val perClassViolations = verifier.verifyClassAgainstPoliciesPerClass(allClasses)
         val violationClasses = perClassViolations.map { it.violatingClass.className }.toSet()
 
         if (verbose) {
@@ -108,32 +99,32 @@ open class JarAllowancesGenerator(
         return preFilterPackageWhiteList.isEmpty() || preFilterPackageWhiteList.any { className.startsWith(it.ensureDot()) }
     }
 
-    private fun listClassnamesFromJar(): Set<String> {
+    private fun listClassnamesFromJars(): Set<String> {
         return jarFiles.map { File(it) }.flatMap { it.getClassNames() }.filter { isJarWhitelistedPackage(it) }.toSet()
     }
 
-    internal fun determineValidClasses(): Set<String> {
-        val jarClasses = listClassnamesFromJar()
+    internal fun determineValidClasses(classLoader: ClassLoader = useClassLoader): Set<String> {
+        val jarClasses = listClassnamesFromJars()
         return when (scanMode) {
             ScanMode.ALL -> jarClasses
-            ScanMode.SAFE -> verifyClasses(jarClasses).verifiedClasses
+            ScanMode.SAFE -> verifyClasses(jarClasses, classLoader).verifiedClasses
         }.filterTo(hashSetOf()) { isAcceptableClass(it) }
     }
 
-    fun generatePolicy(): List<String> {
-        val verifiedClassNames = determineValidClasses()
+    fun generatePolicy(classLoader: ClassLoader = useClassLoader): List<String> {
+        val verifiedClassNames = determineValidClasses(classLoader)
 
         val classAllowancesGenerator = FullClassAllowancesGenerator()
         // TODO: use secure class loader here, we don't want loading a class to cause bad things to happen
         return verifiedClassNames.flatMap { verifiedClassName ->
-            classAllowancesGenerator.generateAllowances(Thread.currentThread().contextClassLoader.loadClass(verifiedClassName))
+            classAllowancesGenerator.generateAllowances(classLoader.loadClass(verifiedClassName))
         }.toPolicy()
     }
 
-    private fun classBytesForClass(className: String, useClassLoader: ClassLoader): NamedClassBytes {
+    private fun classBytesForClass(className: String, classLoader: ClassLoader): NamedClassBytes {
         // TODO: is this robust enough, it isn't clear which classloader to use
         return NamedClassBytes(className,
-                useClassLoader.getResourceAsStream(className.replace('.', '/') + ".class").use { it.readBytes() })
+                classLoader.getResourceAsStream(className.replace('.', '/') + ".class").use { it.readBytes() })
     }
 
     private fun File.getClassNames(): ArrayList<String> {

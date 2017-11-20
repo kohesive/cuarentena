@@ -20,7 +20,7 @@ object LambdaAllowancesGenerator {
         return loadClassAsBytes(className, serClass.classLoader)
     }
 
-    private fun loadClassAsBytes(className: String, loader: ClassLoader = Thread.currentThread().contextClassLoader): NamedClassBytes {
+    private fun loadClassAsBytes(className: String, loader: ClassLoader): NamedClassBytes {
         return NamedClassBytes(className,
                 loader.getResourceAsStream(className.replace('.', '/') + ".class").use { it.readBytes() })
     }

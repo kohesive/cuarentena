@@ -124,12 +124,14 @@ open class JarAllowancesGenerator(
         val verifiedClassNames = determineValidClasses()
 
         val classAllowancesGenerator = FullClassAllowancesGenerator()
+        // TODO: use secure class loader here, we don't want loading a class to cause bad things to happen
         return verifiedClassNames.flatMap { verifiedClassName ->
             classAllowancesGenerator.generateAllowances(Thread.currentThread().contextClassLoader.loadClass(verifiedClassName))
         }.toPolicy()
     }
 
     private fun classBytesForClass(className: String, useClassLoader: ClassLoader): NamedClassBytes {
+        // TODO: is this robust enough, it isn't clear which classloader to use
         return NamedClassBytes(className,
                 useClassLoader.getResourceAsStream(className.replace('.', '/') + ".class").use { it.readBytes() })
     }

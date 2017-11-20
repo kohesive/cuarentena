@@ -5,7 +5,7 @@ import kotlin.reflect.KTypeProjection
 import kotlin.reflect.KVariance
 import kotlin.reflect.full.createType
 
-class TestSignatureUtils {
+class SignatureUtilsTests {
     val types = listOf("int", Int::class.qualifiedName, "long", Long::class.qualifiedName,
             String::class.qualifiedName, java.lang.String::class.qualifiedName,
             Map::class.qualifiedName,

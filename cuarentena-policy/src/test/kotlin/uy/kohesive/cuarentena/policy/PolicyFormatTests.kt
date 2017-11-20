@@ -3,7 +3,7 @@ package uy.kohesive.cuarentena.policy
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class TestPolicyFormats {
+class PolicyFormatTests {
     @Test
     fun testAllFormsOfPolicyItems() {
         val statements = listOf<PolicyAllowance>(

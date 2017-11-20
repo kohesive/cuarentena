@@ -1,6 +1,8 @@
 package uy.kohesive.cuarentena.generator.jarfile
 
 import java.io.File
+import java.net.URL
+import java.util.*
 import kotlin.reflect.KClass
 
 internal object ClassPathUtils {
@@ -11,11 +13,15 @@ internal object ClassPathUtils {
     }
 
 
+    fun <T: Any> getResources(relatedClass: KClass<T>, name: String): Enumeration<URL>? {
+        return relatedClass.java.classLoader.getResources(name) ?:
+                Thread.currentThread().contextClassLoader.getResources(name) ?:
+                ClassLoader.getSystemClassLoader().getResources(name)
+    }
+
     private fun <T : Any> KClass<T>.containingClasspath(filterJarName: Regex = ".*".toRegex()): File? {
         val clp = "${qualifiedName?.replace('.', '/')}.class"
-        val baseList = Thread.currentThread().contextClassLoader.getResources(clp)
-                ?.toList()
-                ?.map { it.toString() }
+        val baseList = getResources(this, clp) ?.toList() ?.map { it.toString() }
         return baseList
                 ?.map { url ->
                     zipOrJarUrlToBaseFile(url) ?: qualifiedName?.let { classFilenameToBaseDir(url, clp) }

@@ -3,7 +3,7 @@ package uy.kohesive.cuarentena.painless
 import org.junit.Test
 import uy.kohesive.cuarentena.policy.toPolicy
 
-class TestPainlessWhitelistParser {
+class PainlessWhitelistParserTests {
     @Test
     fun testParseAllPainlessWhitelistsWithoutExceptions() {
         PainlessWhitelistParser().readDefinitions().let {

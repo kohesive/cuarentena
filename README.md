@@ -24,7 +24,7 @@ Cuarentena use cases:
 Add add the following dependency:
 
 ```
-uy.kohesive.cuarentena:cuarentena:1.0.0-BETA-05
+uy.kohesive.cuarentena:cuarentena:1.0.0-BETA-07
 ```
 
 Subprojects:

@@ -1,3 +1,6 @@
+[![Kotlin](https://img.shields.io/badge/kotlin-1.2.21-blue.svg)](http://kotlinlang.org)  [![Maven Central](https://img.shields.io/maven-central/v/uy.kohesive.cuarentena/cuarentena.svg)](https://mvnrepository.com/artifact/uy.kohesive.cuarentena) [![CircleCI branch](https://img.shields.io/circleci/project/kohesive/cuarentena/master.svg)](https://circleci.com/gh/kohesive/cuarentena/tree/master) [![Issues](https://img.shields.io/github/issues/kohesive/cuarentena.svg)](https://github.com/kohesive/cuarentena/issues?q=is%3Aopen) [![DUB](https://img.shields.io/dub/l/vibe-d.svg)](https://github.com/kohesive/cuarentena/blob/master/LICENSE) [![Kotlin Slack](https://img.shields.io/badge/chat-kotlin%20slack%20%23kohesive-orange.svg)](http://kotlinslackin.herokuapp.com)
+
+
 # Cuarentena
 
 Cuarentena can be used to verify that a JVM class is safe in that it does not call
